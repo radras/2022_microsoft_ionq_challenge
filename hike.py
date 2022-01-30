@@ -43,16 +43,16 @@ max_y = center_y + (n - n//2) * sq_size
 min_x = center_x - (n//2) * sq_size
 min_y = center_y - (n//2) * sq_size
 
-c_size = 10
-step_size = 5
+c_size = 10  #circle size 
+step_size = 5 #5 pixels per every move 
 
 curr_alpha = 0
 curr_beta = 1
-viridis = cm.get_cmap('viridis', 100)
+viridis = cm.get_cmap('viridis', 100) #color map
 
 params = [0.0, 0.0]
 c_x = min_x + (max_x - min_x) * params[curr_alpha]
-c_y = min_y + (max_y - min_y) * params[curr_beta]
+c_y = min_y + (max_y - min_y) * params[curr_beta] 
 
 def create_background():
     background = []
@@ -66,7 +66,7 @@ def create_background():
             color = (255 * cr, 255 * cg, 255 * cb)
             row.append(color)
         background.append(row)
-    return background
+    return background #store in array don't want to recalculate every timne 
 
 def draw():
     for i in range(n):
@@ -116,8 +116,8 @@ def draw():
 background = create_background()
 
 while True:
-    DISPLAYSURF.fill((0,0,0))
-    draw()
+    DISPLAYSURF.fill((0,0,0)) #fill black
+    draw() #draw surface 
     
     keys = pygame.key.get_pressed()
     if keys[K_RIGHT]:
@@ -129,7 +129,7 @@ while True:
     if keys[K_DOWN]:
         c_y = min(c_y + step_size, max_y)
 
-    params[curr_alpha] = (c_x - min_x) / (max_x - min_x)
+    params[curr_alpha] = (c_x - min_x) / (max_x - min_x) #update parameters 
     params[curr_beta] = (c_y - min_y) / (max_y - min_y)
 
     for event in pygame.event.get():
@@ -140,7 +140,7 @@ while True:
             if event.key == K_ESCAPE:
                 pygame.quit()
                 sys.exit()
-
+            #A, s, space wsitch between parameters
             if event.key == K_a:
                 print("Switch slice")
                 curr_alpha = (curr_alpha + 1) % len(params)
