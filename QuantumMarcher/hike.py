@@ -41,10 +41,9 @@ import numpy as np
 
 from quantum import exp_val, hamiltonian, pqc
 from scipy import interpolate
- 
 
 # Load data
-n_qubits = 2
+n_qubits = 3
 E = np.load("QuantumMarcher/data_" + str(n_qubits) + "_qubits.npy")
 
 x = np.linspace(0, 1, len(E[0]))

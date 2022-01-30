@@ -6,7 +6,7 @@ grid_size = 10
 
 for n_qubits in [2, 3]:
     circ = pqc(n_qubits)
-    circ.draw(output='latex', filename="pqc_" + str(n_qubits) + ".png")
+    circ.draw(output='latex', filename="QuantumMarcher/pqc_" + str(n_qubits) + ".png")
 
     H = hamiltonian(n_qubits)
 
@@ -24,14 +24,14 @@ for n_qubits in [2, 3]:
                     E[i, j, k] = exp_val(np.pi * np.array([p[i], p[j], p[k]]), 
                                             circ, H, simulation=True)
 
-    np.save("data_" + str(n_qubits) + "_qubits.npy", E)
+    np.save("QuantumMarcher/data_" + str(n_qubits) + "_qubits.npy", E)
 
 
 import sympy
 sympy.preview(r'$$H = \frac{5}{8} - \frac{1}{8}X_1X_2 - \frac{3}{8}Y_1Y_2 + \frac{1}{8}Z_1Z_2$$', 
-                viewer='file', filename='hamiltonian_2.png', 
+                viewer='file', filename='QuantumMarcher/hamiltonian_2.png', 
                 euler=False, dvioptions=['-D','120'])
 
 sympy.preview(r'$$H = Z_1Z_2 + Z_2Z_3 + X_1 + X_2 + X_3$$', 
-                viewer='file', filename='hamiltonian_3.png', 
+                viewer='file', filename='QuantumMarcher/hamiltonian_3.png', 
                 euler=False, dvioptions=['-D','120'])
