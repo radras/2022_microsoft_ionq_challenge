@@ -23,11 +23,14 @@ Player can move the red circle around the landscape using arrow keys. Game is ov
 
 Your goal is to find the lowest value in each set of parameters. So for example 
 
-### Level 1
+## 
+
+## Level 1
 ![Level 1](QuantumMarcher/level_1.png)
 
-### Level 2
+## Level 2
 ![Level 2](QuantumMarcher/level_2.png)
+
 
 # Running the project
 
