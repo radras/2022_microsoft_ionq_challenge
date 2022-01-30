@@ -18,7 +18,7 @@ Gradient descent is essentially the process of finding a local minimum. In our c
 Essentially, the player has to navigate a terrain (top down view) that ranges in height. Their goal is to get to the maximum height (1). If they run out of time, the game is over. While the beginning levels seem easy, finding the global maximum is quite challenging as the numbers of parameters increase.
 For example, for training 3 parameters, the following process is followed: 
 
-Next Steps: 
+# Next Steps: 
 
 Adding the following features woul
 
