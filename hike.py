@@ -11,13 +11,23 @@ from scipy import interpolate
  
 
 # Load data
-n_qubits = 2
+n_qubits = 3
 E = np.load("data_" + str(n_qubits) + "_qubits.npy")
 
-x = np.linspace(0, 1, len(E[0]))
-g = interpolate.interp2d(x, x, E, kind='cubic')
-def f(params):
-    return g(*params)[0]
+if n_qubits == 2:
+    x = np.linspace(0, 1, len(E[0]))
+    g = interpolate.interp2d(x, x, E, kind='cubic')
+# else:
+#     x = np.linspace(0, 1, len(E[0]))
+#     def g(args):
+#         return interpolate.interpn((x, x, x), E, params)
+    def f(params):
+        return g(*params)[0]
+else:
+    x = np.linspace(0, 1, len(E[0]))
+    def f(params):
+        return interpolate.interpn((x, x, x), E, params)[0]
+
 
 # GUI
 pygame.init()
@@ -50,7 +60,7 @@ curr_alpha = 0
 curr_beta = 1
 viridis = cm.get_cmap('viridis', 100) #color map
 
-params = [0.0, 0.0]
+params = np.zeros(n_qubits)
 c_x = min_x + (max_x - min_x) * params[curr_alpha]
 c_y = min_y + (max_y - min_y) * params[curr_beta] 
 
@@ -106,10 +116,10 @@ def draw():
         textRect.center = (center_x, max_y)
         DISPLAYSURF.blit(text, textRect)
 
-    circ_fig = pygame.image.load("pqc_2.png")
+    circ_fig = pygame.image.load("pqc_" + str(n_qubits) + ".png")
     DISPLAYSURF.blit(circ_fig, (max_x + 20, 100)) 
 
-    H_fig = pygame.image.load("hamiltonian_2.png")
+    H_fig = pygame.image.load("hamiltonian_" + str(n_qubits) + ".png")
     DISPLAYSURF.blit(H_fig, (max_x + 20, 200)) 
 
 
