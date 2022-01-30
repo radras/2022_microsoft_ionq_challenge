@@ -3,7 +3,7 @@
 Adventurous way of learning about training variational circuits.
 Challenge: march down the hill before the storm strikes. 
 
-#Team Hike
+# Team Hike
 
 #Concepts Players can Learn from Quantum Macrher
 
@@ -12,7 +12,7 @@ Variational quantum algorithms are a promising tool for near term quantum comput
 Gradient descent is essentially the process of finding a local minimum. In our case however, the main difference is that the player can see the entire landscape instead of just the possible "steps" (or gradients) immediately around them. The purpose of this is to show the user how they can find a more direct path for a low number of parameters, but how doing so becomes increasingly difficult.
 
 
-#How to Play 
+# How to Play 
 
 
 Essentially, the player has to navigate a terrain (top down view) that ranges in height. Their goal is to get to the maximum height (1). If they run out of time, the game is over. While the beginning levels seem easy, finding the global maximum is quite challenging as the numbers of parameters increase.
