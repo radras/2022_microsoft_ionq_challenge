@@ -9,6 +9,38 @@ import os
 from pygamepopup.menu_manager import MenuManager
 import os, sys
 import random
+import random
+import numpy as np
+from quantum import exp_val, hamiltonian, pqc
+from scipy import interpolate
+
+
+while True:
+    level = input("Choose level: ")
+
+    if level == "1":
+        # Load data
+        n_qubits = 2
+        n_params = n_qubits
+        E = np.load("QuantumMarcher/data_" + str(n_qubits) + "_qubits.npy")
+
+        x = np.linspace(0, 1, len(E[0]))
+        def f(params):
+            return interpolate.interpn(tuple([x for i in range(n_qubits)]), E, params)[0]
+        break
+    elif level == "2":
+        n_params = 3
+        def f(params):
+            return (1 + np.cos(np.pi * params[0]) * np.cos(np.pi * params[1]) * np.cos(np.pi * params[2]) + np.sin(np.pi * params[2]) ** 2) / 3
+        break
+    elif level == "3":
+        n_params = 4
+        def f(params):
+            return (np.cos(np.pi * params[0]) * np.sin(np.pi * params[1]) + np.cos(np.pi * params[3]) * np.sin(np.pi * params[2]) + 2) / 4
+        break
+    else:
+        print("Please choose one of the following levels: 1, 2, 3")
+
 
 TIMER_START = 10
 counter = TIMER_START
@@ -17,8 +49,6 @@ STATE_PLAY = 0
 STATE_WIN = 1
 STATE_LOSE = 2
 STATE_SEL = STATE_PLAY
-
-
 
 pygame.init()
 pygamepopup.init()
@@ -36,20 +66,6 @@ def leave():
 
 
 pygame.display.set_caption('Quantum Marcher')
-import random
-import numpy as np
-
-from quantum import exp_val, hamiltonian, pqc
-from scipy import interpolate
-
-# Load data
-n_qubits = 3
-E = np.load("QuantumMarcher/data_" + str(n_qubits) + "_qubits.npy")
-
-x = np.linspace(0, 1, len(E[0]))
-def f(params):
-    return interpolate.interpn(tuple([x for i in range(n_qubits)]), E, params)[0]
-
 # GUI
 pygame.init()
 
@@ -81,7 +97,7 @@ curr_alpha = 0
 curr_beta = 1
 viridis = cm.get_cmap('viridis', 100) #color map
 
-params = np.zeros(n_qubits)
+params = np.zeros(n_params)
 c_x = min_x + (max_x - min_x) * params[curr_alpha]
 c_y = min_y + (max_y - min_y) * params[curr_beta] 
 
@@ -96,8 +112,6 @@ def restart():
     c_y = min_y + (max_y - min_y) * params[curr_beta]
     STATE_SEL = STATE_PLAY
     counter = TIMER_START
-    
-    print("???")
 
 class MainMenuScene():
     def __init__(self, screen: pygame.surface.Surface, restart_callback, leave):
@@ -186,11 +200,17 @@ def draw_game():
     textRect.center = (c_x, c_y + c_size + 16)
     DISPLAYSURF.blit(text, textRect)
 
-    circ_fig = pygame.image.load("QuantumMarcher/pqc_" + str(n_qubits) + ".png")
-    DISPLAYSURF.blit(circ_fig, (max_x + 20, 100)) 
+    if level == "1":
+        circ_fig = pygame.image.load("QuantumMarcher/pqc_" + str(n_qubits) + ".png")
+        DISPLAYSURF.blit(circ_fig, (max_x + 20, 100)) 
 
-    H_fig = pygame.image.load("QuantumMarcher/hamiltonian_" + str(n_qubits) + ".png")
-    DISPLAYSURF.blit(H_fig, (max_x + 20, 200)) 
+        H_fig = pygame.image.load("QuantumMarcher/hamiltonian_" + str(n_qubits) + ".png")
+        DISPLAYSURF.blit(H_fig, (max_x + 20, 200)) 
+    else:
+        text = font.render("Generated with formula", True, (0, 0, 0), (255, 255, 255))
+        textRect = text.get_rect()
+        textRect.center = (max_x + 150, min_y + 50)
+        DISPLAYSURF.blit(text, textRect)
 
     if f(params) < 0.001:
         text = font.render("Congratulations, you reached the minimum!", True, (0, 0, 255), (0, 0, 0))
@@ -231,14 +251,11 @@ while running:
                 if counter > 0:
                     counter -= 1
                 else: 
-                    print("U lose lmao")
                     STATE_SEL = STATE_LOSE
-                    # Do the thing
-
+                    
             if event.type == KEYUP:
                 if event.key == K_a:
                     counter = TIMER_START
-                    print("Switch slice")
                     curr_alpha = (curr_alpha + 1) % len(params)
                     if curr_alpha == curr_beta:
                         curr_alpha = (curr_alpha + 1) % len(params)
@@ -248,7 +265,6 @@ while running:
 
                 if event.key == K_s:
                     counter = TIMER_START
-                    print("Switch slice")
                     curr_beta = (curr_beta + 1) % len(params)
                     if curr_beta == curr_alpha:
                         curr_beta = (curr_beta + 1) % len(params)
@@ -258,7 +274,6 @@ while running:
 
                 if event.key == K_SPACE:
                     counter = TIMER_START
-                    print("Switch slice")
                     tmp = random.sample(range(len(params)), 2)
                     curr_alpha = tmp[0]
                     curr_beta = tmp[1]
