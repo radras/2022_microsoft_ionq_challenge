@@ -21,9 +21,9 @@ Currently, player can choose between 3 different levels. Level 1 presents a land
 
 Player can move the red circle around the landscape using arrow keys. Game is over when the red circle reaches the lowest value of zero. In case when there are multiple parameters, player can press SPACE to change to another set of two random parameters that will be shown, or keys A and S to change one of the two parameters.
 
-Your goal is to find the lowest value in each set of parameters. So for example 
+Your goal is to find the lowest value in each set of parameters. So for example, in the case of 3 parameters, parameter space can be represented as a cube. In the picture below we show an example of a 2D parameter slice in 3D parameter space that is presented on the player's screen.
 
-## 
+![Parameter space](QuantumMarcher/l2_cube.png)
 
 ## Level 1
 ![Level 1](QuantumMarcher/level_1.png)
