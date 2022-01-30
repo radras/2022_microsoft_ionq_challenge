@@ -29,7 +29,7 @@ Your goal is to find the lowest value in each set of parameters. So for example
 ### Level 2
 ![Level 2](QuantumMarcher/level_2.png)
 
-## Running the project
+# Running the project
 
 To install required packages run
 
