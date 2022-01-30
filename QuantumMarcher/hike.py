@@ -26,7 +26,7 @@ clock = pygame.time.Clock()
 pygame.time.set_timer(pygame.USEREVENT, 1000)
 running = True
 
-DISPLAYSURF = pygame.display.set_mode((600, 600), DOUBLEBUF)    #set the display mode, window title and FPS clock
+DISPLAYSURF = pygame.display.set_mode((900, 600), DOUBLEBUF)    #set the display mode, window title and FPS clock
 
 def leave():
     global running 
@@ -35,7 +35,7 @@ def leave():
     sys.exit()
 
 
-pygame.display.set_caption('Hill Climbing')
+pygame.display.set_caption('Quantum Marcher')
 import random
 import numpy as np
 
@@ -44,23 +44,12 @@ from scipy import interpolate
  
 
 # Load data
-n_qubits = 3
-E = np.load("data_" + str(n_qubits) + "_qubits.npy")
+n_qubits = 2
+E = np.load("QuantumMarcher/data_" + str(n_qubits) + "_qubits.npy")
 
-if n_qubits == 2:
-    x = np.linspace(0, 1, len(E[0]))
-    g = interpolate.interp2d(x, x, E, kind='cubic')
-# else:
-#     x = np.linspace(0, 1, len(E[0]))
-#     def g(args):
-#         return interpolate.interpn((x, x, x), E, params)
-    def f(params):
-        return g(*params)[0]
-else:
-    x = np.linspace(0, 1, len(E[0]))
-    def f(params):
-        return interpolate.interpn((x, x, x), E, params)[0]
-
+x = np.linspace(0, 1, len(E[0]))
+def f(params):
+    return interpolate.interpn(tuple([x for i in range(n_qubits)]), E, params)[0]
 
 # GUI
 pygame.init()
@@ -92,10 +81,6 @@ step_size = 5 #5 pixels per every move
 curr_alpha = 0
 curr_beta = 1
 viridis = cm.get_cmap('viridis', 100) #color map
-
-# def g(p):
-#     return (p[0] + p[1] + p[2]) / 3
-#     # return 1 - ((p[0] - 0.5) ** 2 + (p[1] - 0.5) ** 2 + (p[2] - 0.5) ** 2) * 4 / 3
 
 params = np.zeros(n_qubits)
 c_x = min_x + (max_x - min_x) * params[curr_alpha]
@@ -173,6 +158,18 @@ def create_background():
     return background #store in array don't want to recalculate every timne 
 
 def draw_game():
+    # draw text for axes
+    text = font.render(f'Parameter {curr_alpha}', True, (0, 255, 0), (0, 0, 0))
+    textRect = text.get_rect()
+    textRect.center = (center_x, min_y - 16)
+    DISPLAYSURF.blit(text, textRect)
+
+    text = font.render(f'Parameter {curr_beta}', True, (0, 255, 0), (0, 0, 0))
+    text = pygame.transform.rotate(text, 90)
+    textRect = text.get_rect()
+    textRect.center = (min_x - 16, center_y)
+    DISPLAYSURF.blit(text, textRect)
+
     for i in range(n):
         for j in range(n):
             tmp = [params[it] for it in range(len(params))]
@@ -185,28 +182,15 @@ def draw_game():
                     sq_size, sq_size))
             
     pygame.draw.circle(DISPLAYSURF, (255, 0, 0), (c_x, c_y), c_size)
-    
     text = font1.render(f'{round(f(params), 2)}', True, (0, 0, 0), (255, 255, 255))
     textRect = text.get_rect()
     textRect.center = (c_x, c_y + c_size + 16)
     DISPLAYSURF.blit(text, textRect)
 
-    # draw text for axis
-    text = font.render(f'Parameter {curr_alpha}', True, (0, 255, 0), (0, 0, 0))
-    textRect = text.get_rect()
-    textRect.center = (center_x, min_y - 16)
-    DISPLAYSURF.blit(text, textRect)
-
-    text = font.render(f'Parameter {curr_beta}', True, (0, 255, 0), (0, 0, 0))
-    text = pygame.transform.rotate(text, 90)
-    textRect = text.get_rect()
-    textRect.center = (min_x - 16, center_y)
-    DISPLAYSURF.blit(text, textRect)
-
-    circ_fig = pygame.image.load("pqc_" + str(n_qubits) + ".png")
+    circ_fig = pygame.image.load("QuantumMarcher/pqc_" + str(n_qubits) + ".png")
     DISPLAYSURF.blit(circ_fig, (max_x + 20, 100)) 
 
-    H_fig = pygame.image.load("hamiltonian_" + str(n_qubits) + ".png")
+    H_fig = pygame.image.load("QuantumMarcher/hamiltonian_" + str(n_qubits) + ".png")
     DISPLAYSURF.blit(H_fig, (max_x + 20, 200)) 
 
     if f(params) < 0.001:
@@ -220,6 +204,7 @@ def draw_game():
     timer_text_rect = timer_text.get_rect()
     timer_text_rect.center = (max_x - 16, min_y - 16)
     DISPLAYSURF.blit(timer_text, timer_text_rect)
+    
 
 background = create_background()
 
@@ -288,8 +273,8 @@ while running:
 
     for event in pygame.event.get():
         if event.type == QUIT:
-            # pygame.quit()
-            # sys.exit()
+            pygame.quit()
+            sys.exit()
             running = False
         elif event.type == pygame.MOUSEMOTION:
             mmscene.motion(event.pos)

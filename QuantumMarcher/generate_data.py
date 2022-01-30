@@ -22,16 +22,16 @@ for n_qubits in [2, 3]:
             for j in range(grid_size):
                 for k in range(grid_size):
                     E[i, j, k] = exp_val(np.pi * np.array([p[i], p[j], p[k]]), 
-                                            circ, H, simulation=False)
+                                            circ, H, simulation=True)
 
     np.save("data_" + str(n_qubits) + "_qubits.npy", E)
 
 
 import sympy
-sympy.preview(r'$$H = \frac{5}{8} - \frac{1}{8}XX - \frac{3}{8}YY + \frac{1}{8}ZZ$$', 
+sympy.preview(r'$$H = \frac{5}{8} - \frac{1}{8}X_1X_2 - \frac{3}{8}Y_1Y_2 + \frac{1}{8}Z_1Z_2$$', 
                 viewer='file', filename='hamiltonian_2.png', 
                 euler=False, dvioptions=['-D','120'])
 
-sympy.preview(r'$$H = \frac{1}{8} + \frac{1}{8}IZZ + \frac{1}{8}ZIZ + \frac{1}{8}ZZI + \dots$$', 
+sympy.preview(r'$$H = Z_1Z_2 + Z_2Z_3 + X_1 + X_2 + X_3$$', 
                 viewer='file', filename='hamiltonian_3.png', 
                 euler=False, dvioptions=['-D','120'])

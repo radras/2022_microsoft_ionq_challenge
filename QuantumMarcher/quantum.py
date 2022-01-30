@@ -29,7 +29,8 @@ def hamiltonian(n_qubits):
     if n_qubits == 2:
         return ((5 * I^I) + (-1 * X^X) + (-3 * Y^Y) + (1 * Z^Z)) / 8
     if n_qubits == 3:
-        return (I^I^I + I^Z^Z + Z^I^Z + Z^Z^I + X^X^X - X^Y^Y - Y^X^Y - Y^Y^X) / 8
+        min_e = 3.493959207434926
+        return (min_e * I^I^I + Z^Z^I + I^Z^Z + X^I^I + I^X^I + I^I^X) / (2 * min_e)
 
 def pqc(n_qubits):
     theta = [Parameter('θ_' + str(i)) for i in range(n_qubits)]

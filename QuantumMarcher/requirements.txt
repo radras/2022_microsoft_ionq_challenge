@@ -4,3 +4,4 @@ matplotlib
 qiskit
 pylatexenc
 pygame
+pygame-popup
