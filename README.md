@@ -3,6 +3,8 @@
 Adventurous way of learning about training variational circuits.
 Challenge: march down the hill before the storm strikes. 
 
+Our presentation can be seen [here](QuantumMarcher/QHike.pdf).
+
 # Team Hike
 Radoica Draskic, Jyoti Rani, Saad Mufti, Alice Liu, Emiliia Dyrenkova
 
