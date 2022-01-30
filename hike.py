@@ -1,16 +1,47 @@
-from curses import KEY_UP
-from re import X
-from numpy import fmax, true_divide
+# from curses import KEY_UP
+# from re import X
+# from numpy import fmax, true_divide
 import pygame
 from pygame.locals import *
 import sys
 from matplotlib import cm
-from matplotlib.colors import to_rgb
+import pygamepopup
+from pygamepopup.components import InfoBox, Button
+import os
+# from pygamepopup.menu_manager import MenuManager
+from pygamepopup.menu_manager import MenuManager
+import os, sys
+
+# from matplotlib.colors import to_rgb
 import random
- 
+
+# from MenuManagerScene import MainMenuScene
+
+TIMER_START = 10
+counter = TIMER_START
+
+STATE_PLAY = 0
+STATE_WIN = 1
+STATE_LOSE = 2
+STATE_SEL = STATE_PLAY
+
+
+
 pygame.init()
- 
+pygamepopup.init()
+clock = pygame.time.Clock()
+pygame.time.set_timer(pygame.USEREVENT, 1000)
+running = True
+
 DISPLAYSURF = pygame.display.set_mode((600, 600), DOUBLEBUF)    #set the display mode, window title and FPS clock
+
+def leave():
+    global running 
+    running = False
+    pygame.quit()
+    sys.exit()
+
+
 pygame.display.set_caption('Hill Climbing')
 FPSCLOCK = pygame.time.Clock()
 font = pygame.font.Font('freesansbold.ttf', 16)
@@ -30,12 +61,69 @@ curr_beta = 1
 viridis = cm.get_cmap('viridis', 100)
 
 def g(p):
-    # return (p[0] + p[1] + p[2]) / 3
-    return 1 - ((p[0] - 0.5) ** 2 + (p[1] - 0.5) ** 2 + (p[2] - 0.5) ** 2) * 4 / 3
+    return (p[0] + p[1] + p[2]) / 3
+    # return 1 - ((p[0] - 0.5) ** 2 + (p[1] - 0.5) ** 2 + (p[2] - 0.5) ** 2) * 4 / 3
 
 params = [0.0, 0.0, 0.0]
 c_x = min_x + (max_x - min_x) * params[curr_alpha]
 c_y = min_y + (max_y - min_y) * params[curr_beta]
+
+
+def restart():
+    global curr_alpha, curr_beta, STATE_SEL, STATE_PLAY, counter, TIMER_START, c_x, c_y
+    global min_x, min_y, max_y, max_x, params
+
+    curr_alpha = 0
+    curr_beta = 1
+    c_x = min_x + (max_x - min_x) * params[curr_alpha]
+    c_y = min_y + (max_y - min_y) * params[curr_beta]
+    STATE_SEL = STATE_PLAY
+    counter = TIMER_START
+    
+    print("???")
+
+class MainMenuScene():
+    def __init__(self, screen: pygame.surface.Surface, restart_callback, leave):
+        self.screen = screen
+        self.menu_manager = MenuManager(screen)
+        self.exit_request = False
+
+        self.create_main_menu_interface()
+
+
+
+    def create_main_menu_interface(self):
+        main_menu = InfoBox(
+            "You win!!" if STATE_SEL == STATE_WIN else "Game Over",
+            [
+                [
+                    Button(
+                        title="Play again",
+                        callback=restart
+                    )
+                ],
+                [
+                    Button(title="Exit", callback=leave)
+                ],
+            ],
+            has_close_button=False,
+        )
+        self.menu_manager.open_menu(main_menu)
+
+    def exit(self):
+        self.exit_request = True
+
+    def display(self) -> None:
+        self.menu_manager.display()
+
+    def motion(self, position: pygame.Vector2) -> None:
+        self.menu_manager.motion(position)
+
+    def click(self, button: int, position: pygame.Vector2) -> bool:
+        self.menu_manager.click(button, position)
+        return self.exit_request
+
+mmscene = MainMenuScene(screen=DISPLAYSURF, restart_callback=restart, leave=leave)
 
 def create_background():
     background = []
@@ -51,7 +139,7 @@ def create_background():
         background.append(row)
     return background
 
-def draw():
+def draw_game():
     for i in range(n):
         for j in range(n):
             tmp = [params[it] for it in range(len(params))]
@@ -62,7 +150,6 @@ def draw():
                     (DISPLAYSURF.get_rect().centerx + (i - n//2) * sq_size, 
                     DISPLAYSURF.get_rect().centery + (j - n//2) * sq_size, 
                     sq_size, sq_size))
-
             
     pygame.draw.circle(DISPLAYSURF, (255, 255, 255), (c_x, c_y), c_size)
 
@@ -78,6 +165,11 @@ def draw():
     textRect.center = (min_x - 16, DISPLAYSURF.get_rect().centery)
     DISPLAYSURF.blit(text, textRect)
 
+    timer_text = font.render(f"Time: {counter}", True, (255,255,255), (0,0,0))
+    timer_text_rect = timer_text.get_rect()
+    timer_text_rect.center = (max_x - 16, min_y - 16)
+    DISPLAYSURF.blit(timer_text, timer_text_rect)
+
 background = create_background()
 
 def check_finish():
@@ -88,60 +180,90 @@ def check_finish():
             break
     if finish:
         print("CONGRATS!!!")
+        STATE_SEL = STATE_WIN
 
-while True:
-    DISPLAYSURF.fill((0,0,0))
-    draw()
-    
-    keys = pygame.key.get_pressed()
+while running:
+    if STATE_SEL == STATE_PLAY:
+        time_delta = clock.tick(60)/1000.0
+        DISPLAYSURF.fill((0,0,0))
+        draw_game()
+        
+        keys = pygame.key.get_pressed()
 
-    if keys[K_RIGHT]:
-        c_x = min(c_x + step_size, max_x)
-    if keys[K_LEFT]:
-        c_x = max(c_x - step_size, min_x)
-    if keys[K_UP]:
-        c_y = max(c_y - step_size, min_y)
-    if keys[K_DOWN]:
-        c_y = min(c_y + step_size, max_y)
+        if keys[K_RIGHT]:
+            c_x = min(c_x + step_size, max_x)
+        if keys[K_LEFT]:
+            c_x = max(c_x - step_size, min_x)
+        if keys[K_UP]:
+            c_y = max(c_y - step_size, min_y)
+        if keys[K_DOWN]:
+            c_y = min(c_y + step_size, max_y)
 
-    params[curr_alpha] = (c_x - min_x) / (max_x - min_x)
-    params[curr_beta] = (c_y - min_y) / (max_y - min_y)
+        params[curr_alpha] = (c_x - min_x) / (max_x - min_x)
+        params[curr_beta] = (c_y - min_y) / (max_y - min_y)
+
+        for event in pygame.event.get():
+            if event.type == pygame.USEREVENT:
+                if counter > 0:
+                    counter -= 1
+                else: 
+                    print("U lose lmao")
+                    STATE_SEL = STATE_LOSE
+                    # Do the thing
+
+            if event.type == KEYUP:
+                if event.key == K_a:
+                    counter = TIMER_START
+                    print("Switch slice")
+                    curr_alpha = (curr_alpha + 1) % len(params)
+                    if curr_alpha == curr_beta:
+                        curr_alpha = (curr_alpha + 1) % len(params)
+                        background = create_background()
+                        c_x = min_x + (max_x - min_x) * params[curr_alpha]
+                        c_y = min_y + (max_y - min_y) * params[curr_beta]  
+
+                if event.key == K_s:
+                    counter = TIMER_START
+                    print("Switch slice")
+                    curr_beta = (curr_beta + 1) % len(params)
+                    if curr_beta == curr_alpha:
+                        curr_beta = (curr_beta + 1) % len(params)
+                        background = create_background()
+                        c_x = min_x + (max_x - min_x) * params[curr_alpha]
+                        c_y = min_y + (max_y - min_y) * params[curr_beta]
+
+                if event.key == K_SPACE:
+                    counter = TIMER_START
+                    print("Switch slice")
+                    tmp = random.sample(range(len(params)), 2)
+                    curr_alpha = tmp[0]
+                    curr_beta = tmp[1]
+                    background = create_background()
+                    c_x = min_x + (max_x - min_x) * params[curr_alpha]
+                    c_y = min_y + (max_y - min_y) * params[curr_beta]
+    if STATE_SEL == STATE_WIN:
+        win_modal()
+    if STATE_SEL == STATE_LOSE:
+        mmscene.display()
 
     for event in pygame.event.get():
         if event.type == QUIT:
-            pygame.quit()
-            sys.exit()
+            # pygame.quit()
+            # sys.exit()
+            running = False
+        elif event.type == pygame.MOUSEMOTION:
+            mmscene.motion(event.pos)
+        elif event.type == pygame.MOUSEBUTTONUP:
+            if event.button == 1 or event.button == 3:
+                running = not mmscene.click(event.button, event.pos)
         if event.type == KEYUP:
             if event.key == K_ESCAPE:
                 pygame.quit()
                 sys.exit()
 
-            if event.key == K_a:
-                print("Switch slice")
-                curr_alpha = (curr_alpha + 1) % len(params)
-                if curr_alpha == curr_beta:
-                    curr_alpha = (curr_alpha + 1) % len(params)
-                    background = create_background()
-                    c_x = min_x + (max_x - min_x) * params[curr_alpha]
-                    c_y = min_y + (max_y - min_y) * params[curr_beta]  
 
-            if event.key == K_s:
-                print("Switch slice")
-                curr_beta = (curr_beta + 1) % len(params)
-                if curr_beta == curr_alpha:
-                    curr_beta = (curr_beta + 1) % len(params)
-                    background = create_background()
-                    c_x = min_x + (max_x - min_x) * params[curr_alpha]
-                    c_y = min_y + (max_y - min_y) * params[curr_beta]
-
-            if event.key == K_SPACE:
-                print("Switch slice")
-                tmp = random.sample(range(len(params)), 2)
-                curr_alpha = tmp[0]
-                curr_beta = tmp[1]
-                background = create_background()
-                c_x = min_x + (max_x - min_x) * params[curr_alpha]
-                c_y = min_y + (max_y - min_y) * params[curr_beta]
-    
     pygame.display.flip()
     FPSCLOCK.tick(30)
+    clock.tick(60)
+pygame.quit()
+exit()
