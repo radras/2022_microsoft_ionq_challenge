@@ -21,7 +21,11 @@ Currently, player can choose between 3 different levels. Level 1 presents a land
 
 Player can move the red circle around the landscape using arrow keys. Game is over when the red circle reaches the lowest value of zero. In case when there are multiple parameters, player can press SPACE to change to another set of two random parameters that will be shown, or keys A and S to change one of the two parameters.
 
+### Level 1
+![Level 1](level_1.png)
 
+### Level 2
+![Level 2](level_2.png)
 
 ## Running the project
 
