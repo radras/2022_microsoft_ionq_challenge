@@ -8,34 +8,35 @@ from matplotlib import cm
 from matplotlib.colors import to_rgb
 import random
  
-pygame.init()
+pygame.init() #initializes the window
  
-DISPLAYSURF = pygame.display.set_mode((600, 600), DOUBLEBUF)    #set the display mode, window title and FPS clock
+DISPLAYSURF = pygame.display.set_mode((600, 600), DOUBLEBUF)  # 600 x 600 pixels  #set the display mode, window title and FPS clock
 pygame.display.set_caption('Hill Climbing')
-FPSCLOCK = pygame.time.Clock()
+FPSCLOCK = pygame.time.Clock() 
 font = pygame.font.Font('freesansbold.ttf', 16)
 
-n = 100
-sq_size = 5
+n = 100 #squares of the plotted grid 
+sq_size = 5 #pixel wide every square
 max_x = DISPLAYSURF.get_rect().centerx + (n - n//2) * sq_size
 max_y = DISPLAYSURF.get_rect().centery + (n - n//2) * sq_size
 min_x = DISPLAYSURF.get_rect().centerx - (n//2) * sq_size
-min_y = DISPLAYSURF.get_rect().centery - (n//2) * sq_size
+min_y = DISPLAYSURF.get_rect().centery - (n//2) * sq_size #L R T D coordinates change the centering 
 
-c_size = 10
-step_size = 5
+c_size = 10  #circle size 
+step_size = 5 #5 pixels per every move 
 
 curr_alpha = 0
 curr_beta = 1
-viridis = cm.get_cmap('viridis', 100)
+viridis = cm.get_cmap('viridis', 100) #color map
 
 def g(p):
     # return (p[0] + p[1] + p[2]) / 3
+    #cmap same as gradient 
     return 1 - ((p[0] - 0.5) ** 2 + (p[1] - 0.5) ** 2 + (p[2] - 0.5) ** 2) * 4 / 3
 
 params = [0.0, 0.0, 0.0]
 c_x = min_x + (max_x - min_x) * params[curr_alpha]
-c_y = min_y + (max_y - min_y) * params[curr_beta]
+c_y = min_y + (max_y - min_y) * params[curr_beta] 
 
 def create_background():
     background = []
@@ -49,7 +50,7 @@ def create_background():
             color = (255 * cr, 255 * cg, 255 * cb)
             row.append(color)
         background.append(row)
-    return background
+    return background #store in array don't want to recalculate every timne 
 
 def draw():
     for i in range(n):
@@ -90,8 +91,8 @@ def check_finish():
         print("CONGRATS!!!")
 
 while True:
-    DISPLAYSURF.fill((0,0,0))
-    draw()
+    DISPLAYSURF.fill((0,0,0)) #fill black
+    draw() #draw surface 
     
     keys = pygame.key.get_pressed()
 
@@ -104,7 +105,7 @@ while True:
     if keys[K_DOWN]:
         c_y = min(c_y + step_size, max_y)
 
-    params[curr_alpha] = (c_x - min_x) / (max_x - min_x)
+    params[curr_alpha] = (c_x - min_x) / (max_x - min_x) #update parameters 
     params[curr_beta] = (c_y - min_y) / (max_y - min_y)
 
     for event in pygame.event.get():
@@ -115,7 +116,7 @@ while True:
             if event.key == K_ESCAPE:
                 pygame.quit()
                 sys.exit()
-
+            #A, s, space wsitch between parameters
             if event.key == K_a:
                 print("Switch slice")
                 curr_alpha = (curr_alpha + 1) % len(params)
